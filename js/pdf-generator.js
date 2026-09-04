@@ -164,10 +164,13 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   if (tipo === 'cliente') {
     const linhaValor = container.querySelector('.valor-row');
     if (linhaValor) linhaValor.style.display = 'none';
+
+    const secaoObservacoes = container.querySelector('#secao-observacoes');
+    if (secaoObservacoes) secaoObservacoes.style.display = 'none';
   }
 
   const voucherRoot = container.querySelector('#voucher-root');
-  const nomeArquivo = `voucher-${voucher.numero}-${tipo}.pdf`;
+  const nomeArquivo = `voucher-${voucher.numero}-${tipo === 'cliente' ? 'motorista' : tipo}.pdf`;
 
   // Espera as fontes (Poppins/Dancing Script) carregarem antes de
   // renderizar. Sem isso, o layout pode mudar de tamanho no meio do
