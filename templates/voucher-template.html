@@ -58,7 +58,6 @@
     </div>
 
     <div class="empresa-info">
-      <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-building" xlink:href="#ic-building"></use></svg><span><strong>CNPJ:</strong> <span data-field="transportador_cnpj" id="transportador-cnpj"></span></span></div>
       <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-phone" xlink:href="#ic-phone"></use></svg><span><strong>Tel.:</strong> <span data-field="transportador_telefone" id="transportador-telefone"></span></span></div>
       <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-camera" xlink:href="#ic-camera"></use></svg><span><strong>Instagram:</strong> <span data-field="transportador_instagram" id="transportador-instagram"></span></span></div>
     </div>
@@ -159,12 +158,14 @@
       </tbody>
     </table>
 
-    <!-- OBSERVAÇÕES -->
-    <div class="pill-secao">
-      <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-branco"><use href="#ic-chat" xlink:href="#ic-chat"></use></svg>
-      OBSERVAÇÕES
+    <!-- OBSERVAÇÕES (só aparece no PDF da agência; some no PDF do motorista) -->
+    <div class="secao-observacoes" id="secao-observacoes">
+      <div class="pill-secao">
+        <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-branco"><use href="#ic-chat" xlink:href="#ic-chat"></use></svg>
+        OBSERVAÇÕES
+      </div>
+      <div class="observacoes-texto" data-field="observacoes" id="observacoes"></div>
     </div>
-    <div class="observacoes-texto" data-field="observacoes" id="observacoes"></div>
 
     <!-- CONTATOS INTERNACIONAIS -->
     <div class="contatos-internacionais">
