@@ -1,19 +1,19 @@
 // voucher.js
 // ---------------------------------------------------------------------
-// Camada de dados: tudo que fala com as tabelas als_transportadores,
-// als_clientes e als_vouchers passa por aqui. novo-voucher.html importa essas
+// Camada de dados: tudo que fala com as tabelas transportadores,
+// clientes e vouchers passa por aqui. novo-voucher.html importa essas
 // funções em vez de chamar o supabase diretamente.
 // ---------------------------------------------------------------------
 
 import { supabase } from './supabaseClient.js';
 
 /**
- * Lista todos os als_transportadores cadastrados, com o padrão (is_padrao)
+ * Lista todos os transportadores cadastrados, com o padrão (is_padrao)
  * sempre vindo primeiro — pra pré-selecionar no <select> do formulário.
  */
 export async function listarTransportadores() {
   const { data, error } = await supabase
-    .from('als_transportadores')
+    .from('transportadores')
     .select('*')
     .order('is_padrao', { ascending: false })
     .order('nome', { ascending: true });
@@ -24,13 +24,13 @@ export async function listarTransportadores() {
 
 /**
  * Busca um cliente existente pelo telefone (evita cadastro duplicado
- * do mesmo cliente em als_vouchers diferentes). Se não existir, cria.
+ * do mesmo cliente em vouchers diferentes). Se não existir, cria.
  * Retorna o id do cliente.
  */
 export async function buscarOuCriarCliente({ nome, telefone }) {
   if (telefone) {
     const { data: existente, error: erroBusca } = await supabase
-      .from('als_clientes')
+      .from('clientes')
       .select('id')
       .eq('telefone', telefone)
       .maybeSingle();
@@ -40,7 +40,7 @@ export async function buscarOuCriarCliente({ nome, telefone }) {
   }
 
   const { data: novo, error: erroInsert } = await supabase
-    .from('als_clientes')
+    .from('clientes')
     .insert({ nome, telefone })
     .select('id')
     .single();
@@ -55,7 +55,7 @@ export async function buscarOuCriarCliente({ nome, telefone }) {
  */
 export async function atualizarCliente(id, { nome, telefone }) {
   const { error } = await supabase
-    .from('als_clientes')
+    .from('clientes')
     .update({ nome, telefone })
     .eq('id', id);
 
@@ -69,13 +69,13 @@ export async function atualizarCliente(id, { nome, telefone }) {
  */
 export async function atualizarVoucher(id, dados) {
   const { data, error } = await supabase
-    .from('als_vouchers')
+    .from('vouchers')
     .update(dados)
     .eq('id', id)
     .select(`
       *,
-      cliente:als_clientes(nome, telefone),
-      transportador:als_transportadores(nome, cnpj, telefone, instagram, logo_url)
+      cliente:clientes(nome, telefone),
+      transportador:transportadores(nome, cnpj, telefone, instagram, logo_url)
     `)
     .single();
 
@@ -94,12 +94,12 @@ export async function atualizarVoucher(id, dados) {
  */
 export async function criarVoucher(dados) {
   const { data, error } = await supabase
-    .from('als_vouchers')
+    .from('vouchers')
     .insert(dados)
     .select(`
       *,
-      cliente:als_clientes(nome, telefone),
-      transportador:als_transportadores(nome, cnpj, telefone, instagram, logo_url)
+      cliente:clientes(nome, telefone),
+      transportador:transportadores(nome, cnpj, telefone, instagram, logo_url)
     `)
     .single();
 
@@ -108,17 +108,17 @@ export async function criarVoucher(dados) {
 }
 
 /**
- * Lista todos os als_vouchers, já com cliente e transportador populados —
+ * Lista todos os vouchers, já com cliente e transportador populados —
  * usado pelo dashboard. Filtro (texto/data) é feito no client, já que
- * o volume de als_vouchers é baixo (uso pessoal).
+ * o volume de vouchers é baixo (uso pessoal).
  */
 export async function listarVouchers() {
   const { data, error } = await supabase
-    .from('als_vouchers')
+    .from('vouchers')
     .select(`
       *,
-      cliente:als_clientes(nome, telefone),
-      transportador:als_transportadores(nome, cnpj, telefone, instagram, logo_url)
+      cliente:clientes(nome, telefone),
+      transportador:transportadores(nome, cnpj, telefone, instagram, logo_url)
     `)
     .order('numero', { ascending: false });
 
@@ -132,11 +132,11 @@ export async function listarVouchers() {
  */
 export async function buscarVoucher(id) {
   const { data, error } = await supabase
-    .from('als_vouchers')
+    .from('vouchers')
     .select(`
       *,
-      cliente:als_clientes(nome, telefone),
-      transportador:als_transportadores(nome, cnpj, telefone, instagram, logo_url)
+      cliente:clientes(nome, telefone),
+      transportador:transportadores(nome, cnpj, telefone, instagram, logo_url)
     `)
     .eq('id', id)
     .single();
@@ -146,13 +146,26 @@ export async function buscarVoucher(id) {
 }
 
 /**
+ * Exclui um voucher definitivamente do banco. Usado quando um voucher
+ * foi criado errado e precisa ser removido do dashboard.
+ */
+export async function excluirVoucher(id) {
+  const { error } = await supabase
+    .from('vouchers')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+/**
  * Salva o link do PDF gerado (upload feito separadamente pro Storage)
  * de volta no registro do voucher — histórico acessível no dashboard.
  */
 export async function salvarLinkPdf(voucherId, tipo, url) {
   const campo = tipo === 'agencia' ? 'pdf_agencia_url' : 'pdf_cliente_url';
   const { error } = await supabase
-    .from('als_vouchers')
+    .from('vouchers')
     .update({ [campo]: url })
     .eq('id', voucherId);
 
